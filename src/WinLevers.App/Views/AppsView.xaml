@@ -1,0 +1,224 @@
+<UserControl
+    x:Class="WinLevers.App.Views.AppsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:services="using:WinLevers.App.Services"
+    xmlns:vm="using:WinLevers.Presentation.ViewModels">
+
+  <UserControl.Resources>
+    <services:StateToneToBrushConverter x:Key="ToneBrush" />
+    <services:BoolToVisibilityConverter x:Key="BoolVisible" />
+    <services:RowShadeToBrushConverter x:Key="ShadeBrush" />
+
+    <!-- A header that is a button: the same face as the text it replaces,
+         with the hover that says it can be clicked. -->
+    <Style x:Key="HeaderButtonStyle" TargetType="Button">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="Margin" Value="-4,-2,0,-2" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid Padding="16,12,16,0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!-- Title and count -->
+    <StackPanel Spacing="2">
+      <TextBlock x:Name="LensTitle" Style="{StaticResource PageTitleTextStyle}" />
+      <TextBlock x:Name="LensSubtitle" Style="{StaticResource RowSecondaryTextStyle}" />
+    </StackPanel>
+
+    <!-- Filters. Composable: each one narrows, none widens. Every control
+         here and on the selection bar below is 32px, so the two rows read as
+         one set of controls rather than two. -->
+    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,12,0,10">
+      <AutoSuggestBox x:Name="SearchBox" Width="280" Height="32" QueryIcon="Find"
+                      PlaceholderText="Name, publisher or path"
+                      TextChanged="Search_TextChanged" />
+
+      <ComboBox x:Name="StateFilter" MinWidth="150" Height="32" SelectionChanged="Filter_SelectionChanged"
+                PlaceholderText="Any state" />
+
+      <ComboBox x:Name="KindFilter" MinWidth="120" Height="32" SelectionChanged="Filter_SelectionChanged">
+        <ComboBoxItem Content="Any type" />
+        <ComboBoxItem Content="Packaged" />
+        <ComboBoxItem Content="Desktop" />
+      </ComboBox>
+
+      <ToggleButton x:Name="ModifiedToggle" Content="Modified here" Height="32" Click="Filter_Changed" />
+      <ToggleButton x:Name="RecentToggle" Content="Used in 30 days" Height="32" Click="Filter_Changed" />
+      <ToggleButton x:Name="HideSystemToggle" Content="Hide Windows apps" Height="32" Click="Filter_Changed" />
+
+      <!-- What is on screen, as a file: the visible rows, with this lens's
+           column or, on All apps, every lever's. -->
+      <Button Content="Export CSV…" Height="32" Click="ExportCsv_Click"
+              ToolTipService.ToolTip="The rows shown here, as they are filtered" />
+    </StackPanel>
+
+    <!-- Column headers, aligned with the row template below -->
+    <Grid Grid.Row="2" Padding="10,0,10,6" BorderThickness="0,0,0,1"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="36" />
+        <ColumnDefinition Width="2.2*" />
+        <ColumnDefinition Width="1.4*" />
+        <ColumnDefinition Width="90" />
+        <ColumnDefinition Width="150" />
+        <ColumnDefinition Width="100" />
+      </Grid.ColumnDefinitions>
+
+      <CheckBox x:Name="SelectAllBox" MinWidth="0" Click="SelectAll_Click"
+                ToolTipService.ToolTip="Select everything the filters are showing" />
+      <!-- Click sorts by the column; again flips it. The arrow comes with
+           the label from the shell, so the header and the order cannot
+           disagree. -->
+      <Button Grid.Column="1" Style="{StaticResource HeaderButtonStyle}" Tag="Name" Click="SortHeader_Click"
+              Content="{x:Bind ViewModel.Headers.Name, Mode=OneWay}" ToolTipService.ToolTip="Sort by name" />
+      <Button Grid.Column="2" Style="{StaticResource HeaderButtonStyle}" Tag="Publisher" Click="SortHeader_Click"
+              Content="{x:Bind ViewModel.Headers.Publisher, Mode=OneWay}" ToolTipService.ToolTip="Sort by publisher" />
+      <Button Grid.Column="3" Style="{StaticResource HeaderButtonStyle}" Tag="Type" Click="SortHeader_Click"
+              Content="{x:Bind ViewModel.Headers.Type, Mode=OneWay}" ToolTipService.ToolTip="Sort by type" />
+      <Button Grid.Column="4" Style="{StaticResource HeaderButtonStyle}" Tag="State" Click="SortHeader_Click"
+              Content="{x:Bind ViewModel.Headers.State, Mode=OneWay}" ToolTipService.ToolTip="Sort by state" />
+      <Button Grid.Column="5" Style="{StaticResource HeaderButtonStyle}" Tag="LastUsed" Click="SortHeader_Click"
+              Content="{x:Bind ViewModel.Headers.LastUsed, Mode=OneWay}" ToolTipService.ToolTip="Sort by last used, newest first" />
+    </Grid>
+
+    <!-- The grid itself. Selection is a checkbox bound to the row, not the
+         ListView's own selection, so it survives every filter and lens change. -->
+    <!-- IsItemClickEnabled is not for the click, which nothing handles: with
+         selection off as well, the item presenter treats every row as inert
+         and draws no hover or pressed feedback at all. -->
+    <ListView Grid.Row="3"
+              x:Name="AppList"
+              ItemsSource="{x:Bind ViewModel.Rows, Mode=OneWay}"
+              SelectionMode="None"
+              IsItemClickEnabled="True"
+              ShowsScrollingPlaceholders="False">
+      <ListView.Resources>
+        <!-- The stock feedback is a 6% tint that vanishes under the shades. -->
+        <StaticResource x:Key="ListViewItemBackgroundPointerOver" ResourceKey="RowHoverBrush" />
+        <StaticResource x:Key="ListViewItemBackgroundPressed" ResourceKey="RowPressedBrush" />
+      </ListView.Resources>
+      <ListView.ItemContainerStyle>
+        <Style TargetType="ListViewItem">
+          <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+          <Setter Property="Padding" Value="0" />
+          <Setter Property="MinHeight" Value="0" />
+          <!-- Square, like the shade it sits under. -->
+          <Setter Property="CornerRadius" Value="0" />
+        </Style>
+      </ListView.ItemContainerStyle>
+      <ListView.ItemTemplate>
+        <DataTemplate x:DataType="vm:AppRowViewModel">
+          <!-- Padding lives here rather than on the container so the shade
+               reaches the row's edges. A double-click opens the app in full;
+               the background brush is what makes the empty parts of the row
+               hit-testable for it. -->
+          <Grid Padding="10,4"
+                Background="{x:Bind Shade, Mode=OneWay, Converter={StaticResource ShadeBrush}}"
+                DoubleTapped="Row_DoubleTapped"
+                ToolTipService.ToolTip="Double-click to open this app">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="36" />
+              <ColumnDefinition Width="2.2*" />
+              <ColumnDefinition Width="1.4*" />
+              <ColumnDefinition Width="90" />
+              <ColumnDefinition Width="150" />
+              <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+
+            <CheckBox MinWidth="0" IsChecked="{x:Bind IsSelected, Mode=TwoWay}" />
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+              <TextBlock Text="{x:Bind DisplayName}" Style="{StaticResource RowPrimaryTextStyle}"
+                         ToolTipService.ToolTip="{x:Bind PathText}" />
+              <!-- Flagged, never blocked. Denying the Camera app the camera is
+                   a legitimate thing to want. -->
+              <Border Visibility="{x:Bind IsSystemComponent, Converter={StaticResource BoolVisible}}"
+                      Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                      CornerRadius="3" Padding="4,0" VerticalAlignment="Center">
+                <TextBlock Text="Windows" FontSize="10"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+              </Border>
+            </StackPanel>
+
+            <TextBlock Grid.Column="2" Text="{x:Bind Publisher}"
+                       Style="{StaticResource RowSecondaryTextStyle}" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="3" Text="{x:Bind TypeLabel}"
+                       Style="{StaticResource RowSecondaryTextStyle}" VerticalAlignment="Center" />
+
+            <!-- Glyph, word and colour together. Five states at this density is
+                 exactly where colour-only encoding fails. -->
+            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center"
+                        ToolTipService.ToolTip="{x:Bind BadgeDetail, Mode=OneWay}">
+              <FontIcon Glyph="{x:Bind Badge.Glyph, Mode=OneWay}" FontSize="12"
+                        Foreground="{x:Bind Badge.Tone, Mode=OneWay, Converter={StaticResource ToneBrush}}" />
+              <TextBlock Text="{x:Bind Badge.Label, Mode=OneWay}" FontSize="12"
+                         Foreground="{x:Bind Badge.Tone, Mode=OneWay, Converter={StaticResource ToneBrush}}" />
+            </StackPanel>
+
+            <TextBlock Grid.Column="5" Text="{x:Bind LastUsedText, Mode=OneWay}"
+                       Style="{StaticResource RowSecondaryTextStyle}" VerticalAlignment="Center" />
+          </Grid>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+
+    <!-- Selection bar, visible only when there is a selection -->
+    <Border Grid.Row="4" Margin="0,8,0,12" Padding="12,8"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1" CornerRadius="8"
+            Visibility="{x:Bind ViewModel.HasSelection, Mode=OneWay, Converter={StaticResource BoolVisible}}">
+      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <TextBlock Text="{x:Bind ViewModel.SelectionSummary, Mode=OneWay}"
+                   Style="{StaticResource SectionHeaderTextStyle}" VerticalAlignment="Center"
+                   Margin="0,0,4,0" />
+        <Button Content="Clear" Height="32" Click="ClearSelection_Click" />
+
+        <!-- One button per value of the active lens, tinted for what it does:
+             a grant green, a refusal red, the same roles as the grid's badges.
+             The label carries the count that matters and the tooltip the rest.
+             It goes to Preview with that single lever set. -->
+        <ItemsControl ItemsSource="{x:Bind ViewModel.LensActions, Mode=OneWay}" VerticalAlignment="Center">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" Spacing="8" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:LensAction">
+              <Button Click="QuickAction_Click" IsEnabled="{x:Bind IsEnabled}"
+                      Height="32" Padding="14,0" FontWeight="SemiBold"
+                      Content="{x:Bind Label}"
+                      Background="{x:Bind Tone, Converter={StaticResource ToneBrush}, ConverterParameter=Fill}"
+                      Foreground="{x:Bind Tone, Converter={StaticResource ToneBrush}}"
+                      ToolTipService.ToolTip="{x:Bind Detail}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- The primary action on All apps, where there is no single lever.
+             On a lens page it steps back to a plain "More levers…" so the
+             lens's own buttons are what the bar is about. -->
+        <Button x:Name="EditSettingsButton" Content="Edit settings…" Height="32"
+                Style="{StaticResource AccentButtonStyle}"
+                Click="EditSettings_Click"
+                ToolTipService.ToolTip="Set several levers at once" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>

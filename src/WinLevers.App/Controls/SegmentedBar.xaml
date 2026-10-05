@@ -1,0 +1,35 @@
+<UserControl
+    x:Class="WinLevers.App.Controls.SegmentedBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rep="using:WinLevers.Presentation.Reporting"
+    xmlns:services="using:WinLevers.App.Services">
+
+  <UserControl.Resources>
+    <services:StateToneToBrushConverter x:Key="ToneBrush" />
+  </UserControl.Resources>
+
+  <StackPanel Spacing="6">
+    <Grid x:Name="Bar" Height="6" />
+
+    <!-- Identity by word as well as by colour, and only when asked for: the
+         tiles print their counts underneath already. -->
+    <ItemsControl x:Name="Legend" Visibility="Collapsed">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <StackPanel Orientation="Horizontal" Spacing="14" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="rep:ValueShare">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <Ellipse Width="8" Height="8" VerticalAlignment="Center"
+                     Fill="{x:Bind Tone, Converter={StaticResource ToneBrush}}" />
+            <TextBlock Text="{x:Bind Caption}" FontSize="12"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+          </StackPanel>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</UserControl>

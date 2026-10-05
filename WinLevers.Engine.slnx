@@ -1,0 +1,25 @@
+<Solution>
+  <!-- Everything except the WinUI shell.
+
+       XAML cannot be compiled anywhere but Windows — XamlCompiler.exe is a
+       Windows binary — so a full solution build fails on macOS. This is the
+       solution to open, build and test off Windows; WinLevers.slnx is the whole
+       thing and is what Visual Studio opens on the Windows machine.
+
+       The split is a development convenience, not a second product: both
+       solutions reference the same projects. On Windows, always build the full
+       solution, or the shell reaches the test machine having never been
+       compiled. -->
+  <Folder Name="/src/">
+    <Project Path="src/WinLevers.Core/WinLevers.Core.csproj" />
+    <Project Path="src/WinLevers.Data/WinLevers.Data.csproj" />
+    <Project Path="src/WinLevers.Presentation/WinLevers.Presentation.csproj" />
+    <Project Path="src/WinLevers.Windows/WinLevers.Windows.csproj" />
+    <Project Path="src/WinLevers.Cli/WinLevers.Cli.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WinLevers.Core.Tests/WinLevers.Core.Tests.csproj" />
+    <Project Path="tests/WinLevers.Data.Tests/WinLevers.Data.Tests.csproj" />
+    <Project Path="tests/WinLevers.Presentation.Tests/WinLevers.Presentation.Tests.csproj" />
+  </Folder>
+</Solution>

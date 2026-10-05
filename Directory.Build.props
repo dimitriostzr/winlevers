@@ -1,0 +1,35 @@
+<Project>
+
+  <!-- Core, Data, Presentation and the tests target plain net10.0. Only the
+       WinUI shell, the real registry and the CLI add a -windows TFM. That split
+       is what lets the whole lever engine be developed and tested on a Mac,
+       which matters because the engine is where all the edge cases live. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- This engine decides what to write into other applications' registry
+         keys. A warning here is usually a real defect, so fail the build rather
+         than let one scroll past. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!-- One version for every assembly. The SDK appends the commit hash to the
+       informational version on its own, which is what the About page shows as
+       the build. -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Authors>Dimitrios T</Authors>
+    <Product>WinLevers</Product>
+    <Copyright>Copyright (c) 2026 Dimitrios T</Copyright>
+    <RepositoryUrl>https://github.com/dimitriostzr/winlevers</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>

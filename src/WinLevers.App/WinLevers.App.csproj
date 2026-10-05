@@ -1,0 +1,128 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The only project that targets Windows for real, and the only one holding
+       XAML. Every view model lives in WinLevers.Presentation, because XAML
+       cannot be compiled anywhere but Windows and logic in a project that
+       cannot be built on the development machine is logic nobody can test. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>WinLevers.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/WinLevers.ico</ApplicationIcon>
+    <UseWinUI>true</UseWinUI>
+
+    <Platforms>x64;ARM64</Platforms>
+    <!-- Make a plain `dotnet build` work: default the platform rather than
+         failing on AnyCPU, which WinUI does not support. -->
+    <Platform Condition="'$(Platform)' == '' or '$(Platform)' == 'AnyCPU'">x64</Platform>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+
+    <!-- Follow the chosen platform. Defaulting straight to win-x64 would make
+         an ARM64 build in Visual Studio quietly produce an x64 app that then
+         runs under emulation on the machine it was built for. -->
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == '' and '$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+
+    <AppendPlatformToOutputPath>false</AppendPlatformToOutputPath>
+
+    <!-- Unpackaged Win32 per D7: this app's whole purpose is writing other
+         applications' HKCU keys, and MSIX would give it a virtualized registry
+         view. -->
+    <WindowsPackageType>None</WindowsPackageType>
+
+    <!-- Off by default, and deliberately so. Carrying the Windows App SDK
+         beside the exe gives a folder that runs on a machine with nothing
+         installed, but it also makes every build copy some 230 MB of runtime
+         into the output folder, which nobody pressing F5 wants to wait for.
+         That trade belongs to a deliberate publish, not to every developer
+         opening the solution.
+
+         Publish a release with:
+             dotnet publish src/WinLevers.App -c Release -r win-arm64 -p:Platform=ARM64 ^
+                 -p:SelfContained=true -p:WindowsAppSDKSelfContained=true
+         or win-x64 with -p:Platform=x64. With Windows App SDK 2.3 this ran
+         without the C++ workload installed; the VCInstallPath workaround
+         below covers the one place the targets look for it. Without
+         self-containment the app uses the Windows App Runtime installed on
+         the machine. -->
+    <WindowsAppSDKSelfContained Condition="'$(WindowsAppSDKSelfContained)' == ''">false</WindowsAppSDKSelfContained>
+
+    <!-- A shell is not a library, and XAML code-behind carries no doc comments. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Lets the C# here restore and analyse on the development Mac. The XAML
+         still cannot compile there — XamlCompiler.exe is a Windows binary — so
+         a full build of this project needs Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <!--
+    Works around a crash in the Windows App SDK's XAML targets.
+
+    GetVCInstallPath runs for every WinUI project, C# ones included. When
+    Visual Studio is installed without the C++ workload it still sets
+    VsInstallRoot, so that target calls GetLatestMSVCVersion, which does an
+    unguarded Directory.EnumerateDirectories on VC\Tools\MSVC and throws
+    DirectoryNotFoundException before a single file is compiled.
+
+    The target is skipped entirely when these two are already set. They resolve
+    to vcmeta.dll, which is the C++ metadata reader: a managed project passes it
+    to the XAML compiler and never loads it, so pointing at a path that does not
+    exist costs nothing.
+
+    Applied only when the MSVC directory is genuinely absent, so a machine that
+    does have the C++ workload keeps the real values.
+  -->
+  <PropertyGroup Condition="'$(VsInstallRoot)' != '' and '$(VCToolsInstallDir)' == '' and !Exists('$(VsInstallRoot)\VC\Tools\MSVC')">
+    <VCInstallPath32>$(VsInstallRoot)\VC\Tools\MSVC\not-installed\bin\HostX64\x86\vcmeta.dll</VCInstallPath32>
+    <VCInstallPath64>$(VsInstallRoot)\VC\Tools\MSVC\not-installed\bin\HostX64\x64\vcmeta.dll</VCInstallPath64>
+  </PropertyGroup>
+
+  <!-- dotnet publish drops what an unpackaged app loads at run time: the
+       compiled XAML (.xbf), the resource index (.pri), which in a
+       self-contained build also carries the framework's, and Assets. They are
+       what ms-appx:/// resolves against beside the exe, and the build already
+       puts them in the output folder; without this the published app died on
+       its first window with "XAML parsing failed". -->
+  <Target Name="PublishUnpackagedXamlPayload" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <_XamlPayload Include="$(OutDir)**\*.xbf;$(OutDir)$(AssemblyName).pri"
+                    Exclude="$(OutDir)Microsoft.UI.Xaml\**" />
+      <_AssetPayload Include="$(OutDir)Assets\**\*" />
+      <ResolvedFileToPublish Include="@(_XamlPayload)"
+                             RelativePath="%(RecursiveDir)%(Filename)%(Extension)"
+                             CopyToPublishDirectory="PreserveNewest" />
+      <ResolvedFileToPublish Include="@(_AssetPayload)"
+                             RelativePath="Assets\%(RecursiveDir)%(Filename)%(Extension)"
+                             CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <!-- Assets/ is deliberately not listed here. Microsoft.WinUI.props already
+       includes Assets/**/*.* as Content, and the unpackaged build copies every
+       Content item beside the exe; naming a file again indexes it twice and
+       fails PRI generation with "Duplicate Entry".
+
+       The icon in there reaches the user three ways: embedded in the exe for
+       Explorer and a pinned taskbar button (ApplicationIcon above); set on the
+       window at run time for the live taskbar button and Alt-Tab, which reads
+       the .ico beside the exe; and drawn in the title bar and on the About
+       page from the .png. -->
+
+  <ItemGroup>
+    <ProjectReference Include="../WinLevers.Core/WinLevers.Core.csproj" />
+    <ProjectReference Include="../WinLevers.Data/WinLevers.Data.csproj" />
+    <ProjectReference Include="../WinLevers.Presentation/WinLevers.Presentation.csproj" />
+    <ProjectReference Include="../WinLevers.Windows/WinLevers.Windows.csproj" />
+  </ItemGroup>
+
+</Project>

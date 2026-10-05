@@ -1,0 +1,111 @@
+<UserControl
+    x:Class="WinLevers.App.Views.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ScrollViewer>
+    <!-- Two columns of cards where the window is wide enough, stacked where it
+         is not. Same arrangement as the About page, for the same reason: these
+         cards are short and a single 720px column left two thirds of the
+         window empty. -->
+    <Grid Padding="16,12" MaxWidth="1240" HorizontalAlignment="Left">
+
+      <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup>
+          <!-- Widest first: among triggers that are satisfied, the state
+               declared first wins. -->
+          <VisualState x:Name="TwoColumns">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="1180" />
+            </VisualState.StateTriggers>
+          </VisualState>
+
+          <VisualState x:Name="OneColumn">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="0" />
+            </VisualState.StateTriggers>
+            <VisualState.Setters>
+              <Setter Target="LeftCards.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="LeftCards.Margin" Value="0" />
+              <Setter Target="RightCards.(Grid.Row)" Value="2" />
+              <Setter Target="RightCards.(Grid.Column)" Value="0" />
+              <Setter Target="RightCards.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="RightCards.Margin" Value="0,16,0,0" />
+            </VisualState.Setters>
+          </VisualState>
+        </VisualStateGroup>
+      </VisualStateManager.VisualStateGroups>
+
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <StackPanel Grid.ColumnSpan="2" Margin="0,0,0,16" Spacing="2">
+        <TextBlock Text="Settings" Style="{StaticResource PageTitleTextStyle}" />
+        <TextBlock Text="Stored in a file under %LOCALAPPDATA%\WinLevers, never in the registry."
+                   Style="{StaticResource RowSecondaryTextStyle}" />
+      </StackPanel>
+
+      <StackPanel x:Name="LeftCards" Grid.Row="1" Grid.Column="0"
+                  Margin="0,0,8,0" Spacing="16">
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Appearance" Style="{StaticResource SectionHeaderTextStyle}" />
+            <ComboBox x:Name="ThemeBox" Header="Theme" MinWidth="220"
+                      SelectionChanged="Theme_Changed">
+              <ComboBoxItem Content="Use system setting" />
+              <ComboBoxItem Content="Light" />
+              <ComboBoxItem Content="Dark" />
+            </ComboBox>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Tables" Style="{StaticResource SectionHeaderTextStyle}" />
+            <ToggleSwitch x:Name="AlternateRowsSwitch" Header="Shade every second row"
+                          OnContent="On" OffContent="Off" Toggled="Rows_Toggled" />
+            <ToggleSwitch x:Name="TintDeniedSwitch" Header="Tint rows that are denied under the current lens"
+                          OnContent="On" OffContent="Off" Toggled="Rows_Toggled" />
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+
+      <StackPanel x:Name="RightCards" Grid.Row="1" Grid.Column="1"
+                  Margin="8,0,0,0" Spacing="16">
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Where things are kept" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="The journal records what changed on your machine and is what a revert reads. Snapshots are taken before every batch that writes, and keep, as plain JSON, what each value was. Restoring one is by hand for now. The diagnostic log records what this application did, and is where to look when something went wrong." />
+            <StackPanel Spacing="4">
+              <TextBlock x:Name="JournalPath" FontSize="12" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+              <TextBlock x:Name="SnapshotPath" FontSize="12" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+              <TextBlock x:Name="LogPath" FontSize="12" IsTextSelectionEnabled="True" TextWrapping="Wrap" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Machine-wide settings" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock x:Name="ElevationText" Style="{StaticResource RowSecondaryTextStyle}"
+                       TextWrapping="Wrap" />
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+
+    </Grid>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Plain net10.0, and this is load-bearing. XAML cannot be compiled anywhere
+       but Windows, so everything that is not literally markup lives here where
+       it can be built and tested on the development Mac. WinLevers.App holds
+       views, thin code-behind and DI wiring, and nothing else. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>WinLevers.Presentation</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WinLevers.Core/WinLevers.Core.csproj" />
+    <ProjectReference Include="../WinLevers.Data/WinLevers.Data.csproj" />
+  </ItemGroup>
+
+</Project>

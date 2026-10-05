@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>WinLevers.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WinLevers.Core/WinLevers.Core.csproj" />
+    <ProjectReference Include="../WinLevers.Data/WinLevers.Data.csproj" />
+    <ProjectReference Include="../WinLevers.Presentation/WinLevers.Presentation.csproj" />
+    <ProjectReference Include="../WinLevers.Windows/WinLevers.Windows.csproj" />
+  </ItemGroup>
+
+</Project>

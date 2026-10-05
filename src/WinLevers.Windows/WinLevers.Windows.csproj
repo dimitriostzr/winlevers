@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- The Windows 10 SDK TFM, per the design's project table. It is what
+         PackageManager enumeration will need; the registry alone would not. -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+
+    <!-- Lets this project compile on the development Mac. It can never run
+         there, but a Windows-only project that cannot even be built off Windows
+         would reach the test machine having never seen a compiler. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WinLevers.Core/WinLevers.Core.csproj" />
+  </ItemGroup>
+
+</Project>

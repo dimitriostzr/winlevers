@@ -1,0 +1,159 @@
+<UserControl
+    x:Class="WinLevers.App.Views.PrivacyView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:privacy="using:WinLevers.Presentation.Privacy"
+    xmlns:vm="using:WinLevers.Presentation.ViewModels"
+    xmlns:services="using:WinLevers.App.Services"
+    xmlns:controls="using:WinLevers.App.Controls">
+
+  <UserControl.Resources>
+    <services:StateToneToBrushConverter x:Key="ToneBrush" />
+    <services:BoolToVisibilityConverter x:Key="BoolVisible" />
+  </UserControl.Resources>
+
+  <ScrollViewer>
+    <StackPanel Padding="16,12" Spacing="12">
+      <StackPanel Spacing="2">
+        <TextBlock Text="Privacy advisor" Style="{StaticResource PageTitleTextStyle}" />
+        <TextBlock Text="{x:Bind ViewModel.Summary, Mode=OneWay}" Style="{StaticResource RowSecondaryTextStyle}" />
+      </StackPanel>
+
+      <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                 Text="These permissions let an app watch, listen, locate you or read what is yours. Each card lists the apps allowed one right now; an app with no setting is not refused, Windows decides when it asks. Denying goes through the same preview as every other change, and every change that lands can be put back from History." />
+
+      <!-- Where things stand, before the cards: the same bar the dashboard shows. -->
+      <Border Style="{StaticResource CardBorderStyle}">
+        <Grid ColumnSpacing="20">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Spacing="2" VerticalAlignment="Center" MinWidth="150">
+            <TextBlock Text="{x:Bind ViewModel.Posture.OpenPercentText, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" />
+            <TextBlock Text="of possible grants are open" Style="{StaticResource RowSecondaryTextStyle}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+            <controls:SegmentedBar Shares="{x:Bind ViewModel.Posture.Shares, Mode=OneWay}" ShowLegend="True" />
+            <TextBlock Text="{x:Bind ViewModel.Posture.Headline, Mode=OneWay}" Style="{StaticResource RowSecondaryTextStyle}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- One card per permission. The ones with apps allowed come first and
+           carry a table; the clear ones fold to their header. -->
+      <ItemsControl ItemsSource="{x:Bind ViewModel.Findings, Mode=OneWay}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="privacy:PrivacyFinding">
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,4">
+              <StackPanel Spacing="8">
+                <Grid ColumnSpacing="12">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+
+                  <Border Width="32" Height="32" CornerRadius="16" VerticalAlignment="Top"
+                          Background="{x:Bind VerdictTone, Converter={StaticResource ToneBrush}, ConverterParameter=Fill}">
+                    <FontIcon Glyph="{x:Bind Glyph}" FontSize="15"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Foreground="{x:Bind VerdictTone, Converter={StaticResource ToneBrush}}" />
+                  </Border>
+
+                  <StackPanel Grid.Column="1" Spacing="2">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <TextBlock Text="{x:Bind Title}" Style="{StaticResource RowPrimaryTextStyle}"
+                                 FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <!-- The tier, as a word as well as a colour. -->
+                      <Border CornerRadius="3" Padding="5,1" VerticalAlignment="Center"
+                              Background="{x:Bind TierTone, Converter={StaticResource ToneBrush}, ConverterParameter=Fill}">
+                        <TextBlock Text="{x:Bind TierLabel}" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{x:Bind TierTone, Converter={StaticResource ToneBrush}}" />
+                      </Border>
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind Why}" Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap" />
+                    <TextBlock Text="{x:Bind Headline}" FontSize="12"
+                               Foreground="{x:Bind VerdictTone, Converter={StaticResource ToneBrush}}" />
+                  </StackPanel>
+
+                  <!-- Two ways to close the permission, both through Preview:
+                       take it from the apps that have it, or refuse it to the
+                       apps Windows would still grant it to on request. -->
+                  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+                    <Button Content="Open lens" Height="32" Click="OpenLens_Click"
+                            ToolTipService.ToolTip="Every app under this permission, in the grid" />
+                    <Button Content="{x:Bind DenyNotSetLabel}" Height="32" Click="DenyNotSet_Click"
+                            Visibility="{x:Bind HasNotSet, Converter={StaticResource BoolVisible}}"
+                            ToolTipService.ToolTip="Refuse it to every app that has no setting yet, after a preview" />
+                    <Button Content="{x:Bind DenyAllowedLabel}" Height="32" Click="DenyAllowed_Click"
+                            Visibility="{x:Bind NeedsReview, Converter={StaticResource BoolVisible}}"
+                            Background="{x:Bind TierTone, Converter={StaticResource ToneBrush}, ConverterParameter=Fill}"
+                            ToolTipService.ToolTip="Take it from every app listed here, after a preview" />
+                  </StackPanel>
+                </Grid>
+
+                <StackPanel Visibility="{x:Bind NeedsReview, Converter={StaticResource BoolVisible}}">
+                  <Grid Padding="8,0,8,4" BorderThickness="0,0,0,1"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="36" />
+                      <ColumnDefinition Width="2*" />
+                      <ColumnDefinition Width="1.4*" />
+                      <ColumnDefinition Width="90" />
+                      <ColumnDefinition Width="100" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="1" Text="APPLICATION" Style="{StaticResource TableHeaderTextStyle}" />
+                    <TextBlock Grid.Column="2" Text="PUBLISHER" Style="{StaticResource TableHeaderTextStyle}" />
+                    <TextBlock Grid.Column="3" Text="TYPE" Style="{StaticResource TableHeaderTextStyle}" />
+                    <TextBlock Grid.Column="4" Text="LAST USED" Style="{StaticResource TableHeaderTextStyle}" />
+                  </Grid>
+
+                  <ItemsControl ItemsSource="{x:Bind Allowed}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:AppRowViewModel">
+                        <Grid Padding="8,3">
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="1.4*" />
+                            <ColumnDefinition Width="90" />
+                            <ColumnDefinition Width="100" />
+                          </Grid.ColumnDefinitions>
+                          <CheckBox MinWidth="0" IsChecked="{x:Bind IsSelected, Mode=TwoWay}" />
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind DisplayName}" Style="{StaticResource RowPrimaryTextStyle}"
+                                       ToolTipService.ToolTip="{x:Bind PathText}" />
+                            <Border Visibility="{x:Bind IsSystemComponent, Converter={StaticResource BoolVisible}}"
+                                    Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="3" Padding="4,0" VerticalAlignment="Center">
+                              <TextBlock Text="Windows" FontSize="10"
+                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </Border>
+                          </StackPanel>
+                          <TextBlock Grid.Column="2" Text="{x:Bind Publisher}"
+                                     Style="{StaticResource RowSecondaryTextStyle}" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="3" Text="{x:Bind TypeLabel}"
+                                     Style="{StaticResource RowSecondaryTextStyle}" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="4" Text="{x:Bind LastUsedText}"
+                                     Style="{StaticResource RowSecondaryTextStyle}" VerticalAlignment="Center" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+
+                  <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,8,0,0">
+                    <Button Content="{x:Bind DenySelectedLabel, Mode=OneWay}" Height="32"
+                            IsEnabled="{x:Bind HasSelection, Mode=OneWay}" Click="DenySelected_Click" />
+                    <Button Content="Select all" Height="32" Click="SelectAll_Click" />
+                    <Button Content="Clear" Height="32" Click="ClearSelection_Click" />
+                  </StackPanel>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

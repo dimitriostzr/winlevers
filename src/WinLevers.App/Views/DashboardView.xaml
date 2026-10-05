@@ -1,0 +1,150 @@
+<UserControl
+    x:Class="WinLevers.App.Views.DashboardView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:rep="using:WinLevers.Presentation.Reporting"
+    xmlns:services="using:WinLevers.App.Services"
+    xmlns:controls="using:WinLevers.App.Controls">
+
+  <UserControl.Resources>
+    <services:StateToneToBrushConverter x:Key="ToneBrush" />
+  </UserControl.Resources>
+
+  <ScrollViewer>
+    <StackPanel Padding="16,12" Spacing="16">
+
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Spacing="2">
+          <TextBlock Text="Dashboard" Style="{StaticResource PageTitleTextStyle}" />
+          <TextBlock Text="{x:Bind ViewModel.Subtitle, Mode=OneWay}"
+                     Style="{StaticResource RowSecondaryTextStyle}" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+          <!-- Every explicit setting, as a file that can be reapplied here or
+               on another machine -->
+          <Button Content="Save profile…" Click="SaveProfile_Click"
+                  ToolTipService.ToolTip="Save every explicit setting on this machine as a profile" />
+          <Button Content="Apply profile…" Click="ApplyProfile_Click"
+                  ToolTipService.ToolTip="Match a saved profile against this machine, then preview" />
+
+          <AppBarSeparator />
+
+          <!-- The same data, written out for use elsewhere -->
+          <Button Content="Export CSV…" Click="ExportCsv_Click"
+                  ToolTipService.ToolTip="One row per app, one column per lever" />
+          <Button Content="Export Markdown…" Click="ExportMarkdown_Click"
+                  ToolTipService.ToolTip="A readable report: summary, then each lever's explicit settings" />
+        </StackPanel>
+      </Grid>
+
+      <!-- Headline counts -->
+      <ItemsControl ItemsSource="{x:Bind ViewModel.Tiles, Mode=OneWay}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal" Spacing="10" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="rep:StatTile">
+            <Border Style="{StaticResource CardBorderStyle}" MinWidth="150">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{x:Bind Value}" FontSize="22" FontWeight="SemiBold" />
+                <TextBlock Text="{x:Bind Label}" Style="{StaticResource RowSecondaryTextStyle}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- Privacy at a glance: every listed permission, every app, one bar.
+           The same numbers the advisor page leads with. -->
+      <Border Style="{StaticResource CardBorderStyle}">
+        <Grid ColumnSpacing="20">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Spacing="2" VerticalAlignment="Center" MinWidth="150">
+            <TextBlock Text="Privacy" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Text="{x:Bind ViewModel.Posture.OpenPercentText, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" />
+            <TextBlock Text="of possible grants are open" Style="{StaticResource RowSecondaryTextStyle}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+            <controls:SegmentedBar Shares="{x:Bind ViewModel.Posture.Shares, Mode=OneWay}" ShowLegend="True" />
+            <TextBlock Text="{x:Bind ViewModel.Posture.Headline, Mode=OneWay}" Style="{StaticResource RowSecondaryTextStyle}" />
+          </StackPanel>
+          <Button Grid.Column="2" Content="Open the advisor" Height="32" VerticalAlignment="Center"
+                  Click="OpenAdvisor_Click" />
+        </Grid>
+      </Border>
+
+      <!-- One tile per lever. Each count is coloured for its state — a grant
+           green, a refusal red — with the word beside it, so the colour is
+           never the only thing carrying the meaning. -->
+      <TextBlock Text="Levers" Style="{StaticResource SectionHeaderTextStyle}" Margin="0,4,0,-8" />
+
+      <ItemsControl ItemsSource="{x:Bind ViewModel.Levers, Mode=OneWay}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VariableSizedWrapGrid Orientation="Horizontal" ItemWidth="250" ItemHeight="196" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="rep:LeverSummary">
+            <!-- A Button so the tile has hover and press states for free, and
+                 a click that opens the lever's own page. -->
+            <Button Click="LeverTile_Click" Margin="0,0,10,10"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top"
+                    Padding="14,12"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    ToolTipService.ToolTip="Open this lever">
+              <StackPanel Spacing="4">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Border Width="32" Height="32" CornerRadius="16"
+                          Background="{ThemeResource AccentFillColorDefaultBrush}"
+                          VerticalAlignment="Center">
+                    <FontIcon Glyph="{x:Bind Glyph}" FontSize="15"
+                              Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                              HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Border>
+                  <StackPanel VerticalAlignment="Center" Spacing="1">
+                    <TextBlock Text="{x:Bind DisplayName}" Style="{StaticResource RowPrimaryTextStyle}"
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="{x:Bind Reach}" Style="{StaticResource RowSecondaryTextStyle}" />
+                  </StackPanel>
+                </StackPanel>
+
+                <controls:SegmentedBar Shares="{x:Bind Shares}" Margin="0,10,0,2" />
+
+                <ItemsControl ItemsSource="{x:Bind Shares}" Margin="0,4,0,0">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="rep:ValueShare">
+                      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,1">
+                        <TextBlock Text="{x:Bind CountText}" FontSize="15" FontWeight="SemiBold"
+                                   MinWidth="34" TextAlignment="Right"
+                                   Foreground="{x:Bind Tone, Converter={StaticResource ToneBrush}}" />
+                        <TextBlock Text="{x:Bind Label}" FontSize="12" VerticalAlignment="Center"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,12 @@
+# Solution files are a Windows-tool format and Visual Studio rewrites them with
+# CRLF regardless. Pinning it here keeps a checkout from showing the whole file
+# as modified the first time the solution is opened.
+*.sln text eol=crlf
+*.slnx text eol=lf
+
+# Everything else is normalised on the way in and checked out native.
+* text=auto
+
+# Image assets are binary whatever their bytes look like.
+*.ico binary
+*.png binary

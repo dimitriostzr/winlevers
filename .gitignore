@@ -1,0 +1,26 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+*.user
+*.suo
+
+# IDE
+.vs/
+.idea/
+
+# macOS
+.DS_Store
+
+# Test output
+TestResults/
+*.trx
+
+# Local assistant settings, not part of the project.
+.claude/
+
+# Personal notes, not part of the project.
+ABOUT.md
+FEATURES.md

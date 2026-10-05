@@ -1,0 +1,176 @@
+<UserControl
+    x:Class="WinLevers.App.Views.AboutView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:presentation="using:WinLevers.Presentation">
+
+  <ScrollViewer>
+    <!--
+      Two columns of cards on a window wide enough for them, one below the
+      other when it is not. The default window is 1500 wide and the sidebar
+      takes 280 of it, so at the size this app opens at, two columns fit and
+      the page fills the width it is given. MaxWidth caps the measure: past
+      about 620px a line of prose is too long to track back to the next one,
+      and this page is nothing but prose.
+    -->
+    <Grid Padding="16,12" MaxWidth="1240" HorizontalAlignment="Left">
+
+      <VisualStateManager.VisualStateGroups>
+        <VisualStateGroup>
+          <!-- Widest first: among triggers that are satisfied, the state
+               declared first wins. -->
+          <VisualState x:Name="TwoColumns">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="1180" />
+            </VisualState.StateTriggers>
+            <!-- No setters: the markup below is already the two-column form. -->
+          </VisualState>
+
+          <VisualState x:Name="OneColumn">
+            <VisualState.StateTriggers>
+              <AdaptiveTrigger MinWindowWidth="0" />
+            </VisualState.StateTriggers>
+            <VisualState.Setters>
+              <!-- The right-hand column drops underneath the left one rather
+                   than being squeezed beside it. -->
+              <Setter Target="LeftCards.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="LeftCards.Margin" Value="0" />
+              <Setter Target="RightCards.(Grid.Row)" Value="3" />
+              <Setter Target="RightCards.(Grid.Column)" Value="0" />
+              <Setter Target="RightCards.(Grid.ColumnSpan)" Value="2" />
+              <Setter Target="RightCards.Margin" Value="0,16,0,0" />
+            </VisualState.Setters>
+          </VisualState>
+        </VisualStateGroup>
+      </VisualStateManager.VisualStateGroups>
+
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+
+      <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="14">
+        <Image Width="48" Height="48" VerticalAlignment="Center">
+          <Image.Source>
+            <BitmapImage UriSource="ms-appx:///Assets/WinLevers.png"
+                         DecodePixelWidth="48" DecodePixelType="Logical" />
+          </Image.Source>
+        </Image>
+        <StackPanel Spacing="2" VerticalAlignment="Center">
+          <TextBlock Text="WinLevers" Style="{StaticResource PageTitleTextStyle}" />
+          <TextBlock x:Name="VersionText" Style="{StaticResource RowSecondaryTextStyle}" />
+          <HyperlinkButton x:Name="AuthorLink" Padding="0" />
+        </StackPanel>
+      </StackPanel>
+
+      <!-- Targets are set in code from AppInfo, so the page and the README
+           can never point at different places. -->
+      <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,16,0,16"
+                  Orientation="Horizontal" Spacing="8">
+        <HyperlinkButton x:Name="RepositoryLink" Content="Source on GitHub" />
+        <Button x:Name="OpenLogsButton" Content="Open the log folder" Click="OpenLogs_Click" />
+      </StackPanel>
+
+      <StackPanel x:Name="LeftCards" Grid.Row="2" Grid.Column="0"
+                  Margin="0,0,8,0" Spacing="16">
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Why it exists" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Windows lets you change an app's permissions and graphics preference one app at a time, across several Settings pages, and keeps no record of what you changed. On a machine with a couple of hundred installed apps that is an afternoon of clicking with no undo. I wanted to select all of them, decide once, see exactly what would be written before it was, and be able to put every change back. That is the whole app." />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="A personal project by one person, free and open source under the MIT licence, with no warranty and no support — which is why every write is previewed and journaled, and every change that lands can be put back. There is no download: it edits the registry, so it is meant to be built from source by people who have read it." />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="What it does" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Lists the apps it finds in one grid: desktop apps from Windows' uninstall records, and packaged apps once Windows has recorded a permission for them. For each privacy permission Windows keeps per app — location, camera, microphone, notifications, contacts, calendar and the rest — you can allow or deny any number of apps in one operation. For desktop apps it can also set which GPU Windows prefers when launching them. That is the full list: every change is a per-user value under HKCU, the same one Windows Settings edits, and it writes nothing machine-wide." />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Every write is journaled with the value it replaced. Any change that landed can be put back, on its own or with its batch; a write that failed, or read back differently from what was written, is recorded as failed and left out of a revert." />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="What it never does" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Write anything without showing you the exact list first. Skip the snapshot taken before every batch. Take ownership of a registry key it was not given access to. Write into a key whose shape it does not recognise. Overwrite a value you have changed elsewhere since — a revert shows the difference and leaves that value alone. Store its own settings in the registry it edits." />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="What it collects" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Nothing. The app has no network access: it sends no telemetry, checks for no updates and never contacts anything. Everything it reads stays on this machine, and the only files it writes are the ones listed below." />
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+
+      <StackPanel x:Name="RightCards" Grid.Row="2" Grid.Column="1"
+                  Margin="8,0,0,0" Spacing="16">
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Where it keeps things" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Everything lives under %LOCALAPPDATA%\WinLevers: the journal of what changed on this machine, the pre-batch snapshots, the diagnostic log of what the application did, and its own settings. Full paths are on the Settings page. When something went wrong, the newest file in the log folder says what the application did." />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Trademarks and affiliation" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="WinLevers is an independent personal project. It is not affiliated with, endorsed by, sponsored by or supported by Microsoft Corporation, nor by any of the companies whose applications appear in the grid. No such endorsement is claimed or implied." />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="Microsoft, Windows, Visual Studio, WinUI and .NET are trademarks or registered trademarks of Microsoft Corporation in the United States and other countries. Every other application, product or company name shown anywhere in this app is a trademark of its respective owner. The names in the grid are not chosen by this project: they are read from the records Windows keeps on this machine, and are shown only to identify the software concerned." />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Use at your own risk" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
+                       Text="This app changes your registry, and changing app permissions in bulk can stop applications working the way you expect. It is provided as is, without warranty of any kind, express or implied. You use it entirely at your own risk, and the author accepts no liability for any loss arising from its use. Take a full System Restore point before your first batch; the notice shown at launch has a button that opens the Windows page for it." />
+          </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource CardBorderStyle}">
+          <StackPanel Spacing="8">
+            <TextBlock Text="Open source" Style="{StaticResource SectionHeaderTextStyle}" />
+            <TextBlock x:Name="CopyrightText" Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap" />
+            <TextBlock x:Name="LicenseText" Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap" />
+            <HyperlinkButton x:Name="LicenseLink" Content="Read the licence" Padding="0,2" />
+            <TextBlock Text="Built on" Style="{StaticResource RowSecondaryTextStyle}" Margin="0,6,0,0" />
+            <ItemsControl x:Name="ThirdPartyList">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="presentation:ThirdPartyNotice">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <HyperlinkButton Content="{x:Bind Name}" NavigateUri="{x:Bind Url}" Padding="0,2" />
+                    <TextBlock Text="{x:Bind License}" Style="{StaticResource RowSecondaryTextStyle}"
+                               VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+
+    </Grid>
+  </ScrollViewer>
+</UserControl>
