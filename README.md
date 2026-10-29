@@ -213,9 +213,7 @@ To make the same files the Releases page offers (a portable zip and an
 ./scripts/Build-Release.ps1 -SkipInstaller   # the portable zips only
 ```
 
-The [release workflow](.github/workflows/release.yml) runs that script on GitHub Actions on every
-push to `main` that changes the app and replaces the release with the new build. The version is
-`<Version>` in `Directory.Build.props`.
+The version is `<Version>` in `Directory.Build.props`.
 
 The engine and view models build and test on macOS and Linux too, without the WinUI shell:
 
