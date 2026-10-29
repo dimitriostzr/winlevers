@@ -4,6 +4,9 @@ Notable changes, newest first. Versions are git tags.
 
 ## Unreleased
 
+- Downloadable builds. The Releases page carries a per-user installer and a
+  portable zip for x64 and ARM64, self-contained, built by GitHub Actions on
+  every push to `main`. Only the latest build is kept.
 - A risk notice on every launch, before the app can be used. It recommends a
   full System Restore point, with a button that opens the Windows System
   Protection page, states that the app comes with no warranty and no support,

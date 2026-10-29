@@ -47,8 +47,9 @@ below is the summary; each affected section also carries a note. As of
 
 ## What this is
 
-> *Original proposal.* As built, there is no download and no GitHub
-> Releases; the app is built from source. Snapshot restore was not built.
+> *Original proposal.* As built, GitHub Releases carries only the latest
+> build, as a per-user installer and a portable zip. Snapshot restore was not
+> built.
 
 A Windows desktop application that lets a user select many installed applications
 at once and apply battery and privacy-permission settings to all of them in a

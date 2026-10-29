@@ -86,8 +86,16 @@ To keep your system clean and predictable, WinLevers commits to these rules:
 
 ## Quick Start
 
-### Why build from source?
-There are no pre-compiled binary releases. Because WinLevers interacts directly with system registry keys, you should always know exactly what code is running on your machine. You build it from source you can inspect and verify.
+### Download
+Get the latest build from the [Releases page](https://github.com/dimitriostzr/winlevers/releases/latest):
+
+* **Installer** — `WinLevers-<version>-win-x64-setup.exe` (Intel/AMD) or `-win-arm64-setup.exe` (ARM). Installs for the current user only, into `%LOCALAPPDATA%\Programs\WinLevers`, without administrator rights.
+* **Portable** — `WinLevers-<version>-win-x64-portable.zip` or `-win-arm64-portable.zip`. Unzip anywhere and run `WinLevers.App.exe`.
+
+Both include the .NET runtime and the Windows App SDK, so nothing else needs to be installed. Only the latest version is published. The builds are not code-signed, so SmartScreen may warn on first launch: choose **More info → Run anyway**. `SHA256SUMS.txt` in the release lists the checksum of every file.
+
+### Building from source
+WinLevers writes to registry keys, so you may prefer to run code you have read and built yourself.
 
 ### Prerequisites
 * **.NET 10 SDK**
@@ -174,6 +182,11 @@ To build a standalone folder that runs without requiring .NET or the Windows App
 dotnet publish src/WinLevers.App -c Release -r win-x64 -p:Platform=x64 --self-contained true -p:WindowsAppSDKSelfContained=true
 ```
 *(Use `-r win-arm64 -p:Platform=ARM64` on ARM64 hardware).*
+
+### Release builds
+`scripts/Build-Release.ps1` builds what the Releases page offers: a portable zip and an [Inno Setup](https://jrsoftware.org/isinfo.php) installer for x64 and ARM64, in `artifacts/release`. It needs Inno Setup 6, or pass `-SkipInstaller` for the zips alone.
+
+The [release workflow](.github/workflows/release.yml) runs the same script on GitHub Actions on every push to `main` that changes the app, then replaces the existing release with the new build. The version is `<Version>` in `Directory.Build.props`.
 
 ---
 
