@@ -87,7 +87,7 @@
             <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
                        Text="Windows lets you change an app's permissions and graphics preference one app at a time, across several Settings pages, and keeps no record of what you changed. On a machine with a couple of hundred installed apps that is an afternoon of clicking with no undo. I wanted to select all of them, decide once, see exactly what would be written before it was, and be able to put every change back. That is the whole app." />
             <TextBlock Style="{StaticResource RowSecondaryTextStyle}" TextWrapping="Wrap"
-                       Text="A personal project by one person, free and open source under the MIT licence, with no warranty and no support — which is why every write is previewed and journaled, and every change that lands can be put back. There is no download: it edits the registry, so it is meant to be built from source by people who have read it." />
+                       Text="A personal project by one person, free and open source under the MIT licence, with no warranty and no support — which is why every write is previewed and journaled, and every change that lands can be put back. It edits the registry, so the source is public for anyone to read: download a ready-made build from GitHub, or build it yourself from what you have read." />
           </StackPanel>
         </Border>
 

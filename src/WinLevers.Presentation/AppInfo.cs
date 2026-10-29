@@ -42,7 +42,8 @@ public static class AppInfo
     /// <summary>Everything this app is built on, with its licence.</summary>
     public static IReadOnlyList<ThirdPartyNotice> ThirdParty { get; } =
     [
-        new("Windows App SDK and WinUI 3", "MIT", new Uri("https://github.com/microsoft/WindowsAppSDK")),
+        new(".NET runtime", "MIT", new Uri("https://github.com/dotnet/runtime")),
+        new("Windows App SDK and WinUI 3", "Microsoft Software License Terms", new Uri("https://github.com/microsoft/WindowsAppSDK")),
         new("CommunityToolkit.Mvvm", "MIT", new Uri("https://github.com/CommunityToolkit/dotnet")),
         new("Entity Framework Core", "MIT", new Uri("https://github.com/dotnet/efcore")),
         new("SQLitePCLRaw", "Apache-2.0", new Uri("https://github.com/ericsink/SQLitePCL.raw")),

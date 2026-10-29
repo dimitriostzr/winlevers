@@ -1,12 +1,31 @@
 # Changelog
 
-Notable changes, newest first. Versions are git tags.
+Notable changes, newest first. Each version matches a GitHub release; only the
+latest is kept on the Releases page.
 
-## Unreleased
+## 0.1.0 — preview
 
-- Downloadable builds. The Releases page carries a per-user installer and a
-  portable zip for x64 and ARM64, self-contained, built and uploaded by
-  `scripts/Build-Release.ps1 -Publish`. Only the latest build is kept.
+First public release. Everything in it is a per-user (`HKCU`) setting.
+
+- Privacy permission lenses: one per capability Windows lists under
+  *App permissions*, with allow / deny / not set per app.
+- GPU preference lever for desktop apps: power saving or high performance.
+- Select any set of apps, set several levers at once, preview the exact
+  writes, apply as one batch.
+- Journal of every write with the value it replaced; revert a change or a
+  batch from *History*; a revert that finds a value changed since reports it.
+- Snapshot of the values each batch will write, saved as JSON and flushed
+  before the first write.
+- Profiles: capture the current settings and apply them again later.
+- Dashboard with counts per lever, and CSV export of every table.
+- Privacy advisor: the permissions that matter most, who holds each, and a
+  deny for the allowed apps or for the ones with no setting.
+- A privacy bar on the dashboard and the advisor, and a bar per lever tile.
+- Sort the grid by any column from its header.
+- Remembers window placement, theme and table options.
+
+Also in this release:
+
 - A risk notice on every launch, before the app can be used. It recommends a
   full System Restore point, with a button that opens the Windows System
   Protection page, states that the app comes with no warranty and no support,
@@ -48,28 +67,9 @@ Notable changes, newest first. Versions are git tags.
   start. Build quirks moved under Troubleshooting, the support policy is
   stated once, and the note on how it was made sits at the end.
 
-## 0.1.0 — preview
-
-First public release. Everything in it is a per-user (`HKCU`) setting.
-
-- Privacy permission lenses: one per capability Windows lists under
-  *App permissions*, with allow / deny / not set per app.
-- GPU preference lever for desktop apps: power saving or high performance.
-- Select any set of apps, set several levers at once, preview the exact
-  writes, apply as one batch.
-- Journal of every write with the value it replaced; revert a change or a
-  batch from *History*; a revert that finds a value changed since reports it.
-- Snapshot of the values each batch will write, saved as JSON and flushed
-  before the first write.
-- Profiles: capture the current settings and apply them again later.
-- Dashboard with counts per lever, and CSV export of every table.
-- Privacy advisor: the permissions that matter most, who holds each, and a
-  deny for the allowed apps or for the ones with no setting.
-- A privacy bar on the dashboard and the advisor, and a bar per lever tile.
-- Sort the grid by any column from its header.
-- Remembers window placement, theme and table options.
-
-There is no download: build it from source, as the README explains.
+Downloads: a per-user installer and a portable zip for x64 and ARM64,
+self-contained, on the Releases page, with the third-party licences beside
+the exe. Or build it from source, as the README explains.
 
 Known limits: the background-activity and startup levers described in the
 design are not in this release, and nothing writes machine-wide under `HKLM`.

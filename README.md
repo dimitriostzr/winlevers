@@ -297,4 +297,5 @@ whose apps appear in it.
 
 ## Licence
 
-[MIT](LICENSE) © 2026 Dimitrios T.
+[MIT](LICENSE) © 2026 Dimitrios T. The downloads also carry the .NET runtime, the Windows App SDK
+and other components, which keep their own licences; see `THIRD_PARTY_NOTICES.txt` beside the app.
