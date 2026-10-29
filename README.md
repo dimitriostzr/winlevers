@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://github.com/dimitriostzr/winlevers/releases/latest"><strong>⬇&nbsp;Download the latest release</strong></a><br />
   Windows 10 and 11 (x64 and Arm) · installer or portable<br />
-  <sub>Free, no account. <a href="#download">First-run notes</a> · <a href="#build-it-yourself">Build it yourself</a></sub>
+  <sub>Free, no account. <a href="#first-run-the-windows-warnings">First-run notes</a> · <a href="#build-it-yourself">Build it yourself</a></sub>
 </p>
 
 ![The app grid on the Microphone lens](docs/images/apps-grid.png)
@@ -42,24 +42,50 @@
 
 Ready-to-run builds are on the [Releases](https://github.com/dimitriostzr/winlevers/releases/latest) page. Pick the file for your system; each link below always fetches the latest version:
 
-| System                      | File | First run |
-| --------------------------- | ---- | --------- |
-| Windows 10 / 11             | [`WinLevers-win-x64-setup.exe`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-x64-setup.exe) | SmartScreen may warn about an unknown publisher: choose **More info → Run anyway**, once. Installs for you only, with no administrator prompt. |
+| System                      | File | Notes |
+| --------------------------- | ---- | ----- |
+| Windows 10 / 11             | [`WinLevers-win-x64-setup.exe`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-x64-setup.exe) | Installs for you only, into `%LOCALAPPDATA%\Programs\WinLevers`, with no administrator prompt. |
 | Windows 11 on Arm           | [`WinLevers-win-arm64-setup.exe`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-arm64-setup.exe) | The same. |
-| Windows, without installing | [`WinLevers-win-x64-portable.zip`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-x64-portable.zip) or [`…-arm64-portable.zip`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-arm64-portable.zip) | Unzip anywhere and run `WinLevers.App.exe`. No Start menu entry or uninstaller. SmartScreen may warn the same way. |
+| Windows, without installing | [`WinLevers-win-x64-portable.zip`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-x64-portable.zip) or [`…-arm64-portable.zip`](https://github.com/dimitriostzr/winlevers/releases/latest/download/WinLevers-win-arm64-portable.zip) | Unzip anywhere and run `WinLevers.App.exe`. No Start menu entry or uninstaller. |
 
 Windows 10 version 1809 or later, 64-bit. Nothing else needs to be installed: the .NET runtime
-and the Windows App SDK are included. The installer puts the app in
-`%LOCALAPPDATA%\Programs\WinLevers`; uninstalling it keeps the journal of what it changed.
+and the Windows App SDK are included. Uninstalling keeps the journal of what the app changed.
 
 `SHA256SUMS.txt` lists each file's checksum. To check a download, run
 `Get-FileHash .\WinLevers-win-x64-setup.exe` in PowerShell and compare the hash with the line in
 `SHA256SUMS.txt`.
 
-The SmartScreen warning appears because the builds aren't signed with a paid certificate from
-Microsoft; it doesn't mean anything is wrong. If you'd rather not click through it, or would
-rather run only code you have read, [build it yourself](#build-it-yourself).
+### First run: the Windows warnings
 
+The builds aren't signed with a paid code-signing certificate, so Edge and Windows warn about
+them until enough people have downloaded them. Both warnings come from SmartScreen, the
+reputation check built into Windows: they mean the file is unsigned and not yet widely
+downloaded, not that anything was found in it. You see each one once.
+
+**1. Edge: "… isn't commonly downloaded"**
+
+1. In the downloads panel, point at the file and choose **⋯ (More actions) → Keep**.
+2. Edge asks again: choose **Show more → Keep anyway**.
+
+Chrome and Firefox may ask the same in their own words; choose **Keep**.
+
+**2. Windows: "Windows protected your PC"**
+
+1. Run the installer. On the blue window, choose **More info**.
+2. Check that the app name is the file you downloaded and the publisher reads
+   **Unknown publisher**, then choose **Run anyway**.
+
+**The portable zip:** unblock it before unzipping, and Windows won't ask again for the files
+inside.
+
+1. Right-click the zip and choose **Properties**.
+2. On the **General** tab, tick **Unblock** and choose **OK**.
+3. Unzip it and run `WinLevers.App.exe`.
+
+**If Microsoft Defender names a threat** instead (for example "Trojan:Win32/…"), don't override
+it. Check the file against `SHA256SUMS.txt` as above: unsigned installers are sometimes flagged
+by mistake, but if you are unsure, delete the file and [build it yourself](#build-it-yourself)
+from the source.
 > [!WARNING]
 > **Use at your own risk.** WinLevers edits the Windows registry. It is provided as is, without
 > warranty of any kind, and the author accepts no liability for any loss arising from its use.

@@ -18,9 +18,22 @@ The installer installs for the current user only, into `%LOCALAPPDATA%\Programs\
 never asks for administrator rights. Uninstalling leaves the journal, snapshots and settings in
 `%LOCALAPPDATA%\WinLevers`, so the record of what the app changed is not lost.
 
-The builds are not code-signed, so Windows SmartScreen may warn on first launch. Choose
-**More info → Run anyway**. If you would rather not run a binary you did not build, the README
-explains how to build it from source.
+## First run: the Windows warnings
+
+The builds are not signed with a paid code-signing certificate, so Edge and Windows warn about
+them until enough people have downloaded them. Both warnings are SmartScreen's reputation check,
+not a sign that anything was found in the file.
+
+1. **Edge, "isn't commonly downloaded":** in the downloads panel choose **⋯ → Keep**, then
+   **Show more → Keep anyway**.
+2. **Windows, "Windows protected your PC":** choose **More info**, then **Run anyway**.
+3. **Portable zip:** before unzipping, right-click it, choose **Properties**, tick **Unblock**
+   and choose **OK**.
+
+If Microsoft Defender names a threat instead, don't override it: check the file against
+`SHA256SUMS.txt`, or build from source. The
+[README](https://github.com/dimitriostzr/winlevers#first-run-the-windows-warnings) has the steps
+in full.
 
 Use at your own risk: create a System Restore point before applying changes. See the
 [changelog](https://github.com/dimitriostzr/winlevers/blob/main/CHANGELOG.md) for what is in this
