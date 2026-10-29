@@ -247,15 +247,24 @@ The engine and view models build and test on macOS and Linux too, without the Wi
 dotnet test WinLevers.Engine.slnx
 ```
 
-A command-line tool shares the same engine:
+A command-line tool shares the same engine. It is not in the downloads: run it from source. It
+uses the same journal as the app, so a batch applied in one can be reverted from the other.
 
 ```sh
-dotnet run --project src/WinLevers.Cli -- scan       # installed apps and levers
-dotnet run --project src/WinLevers.Cli -- levers     # the available levers
-dotnet run --project src/WinLevers.Cli -- plan --set <leverId>=<value> --app <substring>   # dry run, writes nothing
-dotnet run --project src/WinLevers.Cli -- probe      # registry structures
+cd src/WinLevers.Cli
+dotnet run -- scan [--all]                                     # read every managed setting; writes nothing
+dotnet run -- levers                                           # every lever and its allowed values
+dotnet run -- plan  --set <leverId>=<value> --app <substring>  # show what would change; writes nothing
+dotnet run -- apply --set <leverId>=<value> --app <substring>  # make the changes, after confirming
+dotnet run -- history                                          # past batches
+dotnet run -- revert <batchId>                                 # put a batch back
+dotnet run -- probe [--key <path>] [--hklm] [--depth n]        # dump raw keys for levers not yet built
 ```
 
+`--app` matches part of an app's name or key and can be repeated; `--all-apps` targets every app
+and has to be asked for by name. `apply` and `revert` ask before writing; `--yes` skips the
+question, for scripts, but the full list of writes is always printed first, and every write is
+journaled.
 **Troubleshooting**
 
 - **Visual Studio shows "unknown project configuration mappings":** close it and delete the
