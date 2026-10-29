@@ -96,27 +96,29 @@ function Write-ThirdPartyNotices([string] $PublishDir, [string] $Rid) {
     $sqlite = $pinned['SQLitePCLRaw.lib.e_sqlite3']
     $rule = '=' * 78
 
+    # Each section in parentheses: a comma binds tighter than +, so without them
+    # "a", "b" + "c" makes three entries, not two.
     $sections = @(
-        "WinLevers`nMIT licence`n`n$(Read-Text (Join-Path $root 'LICENSE'))",
-        ".NET runtime $runtime`nMIT licence, https://github.com/dotnet/runtime`n`n" +
+        ("WinLevers`nMIT licence`n`n$(Read-Text (Join-Path $root 'LICENSE'))"),
+        (".NET runtime $runtime`nMIT licence, https://github.com/dotnet/runtime`n`n" +
             (Read-Package "Microsoft.NETCore.App.Runtime.$Rid" $runtime 'LICENSE.TXT') + "`n`n" +
-            (Read-Package "Microsoft.NETCore.App.Runtime.$Rid" $runtime 'THIRD-PARTY-NOTICES.TXT'),
-        "Windows App SDK $sdk (including WinUI 3)`nMicrosoft Software License Terms, https://github.com/microsoft/WindowsAppSDK`n" +
+            (Read-Package "Microsoft.NETCore.App.Runtime.$Rid" $runtime 'THIRD-PARTY-NOTICES.TXT')),
+        ("Windows App SDK $sdk (including WinUI 3)`nMicrosoft Software License Terms, https://github.com/microsoft/WindowsAppSDK`n" +
             "The Windows App SDK files in this folder are redistributed under these terms.`n`n" +
             (Read-Package 'Microsoft.WindowsAppSDK' $sdk 'license.txt') + "`n`n" +
-            (Read-Package 'Microsoft.WindowsAppSDK' $sdk 'NOTICE.txt'),
-        "CommunityToolkit.Mvvm $toolkit`nMIT licence, https://github.com/CommunityToolkit/dotnet`n`n" +
+            (Read-Package 'Microsoft.WindowsAppSDK' $sdk 'NOTICE.txt')),
+        ("CommunityToolkit.Mvvm $toolkit`nMIT licence, https://github.com/CommunityToolkit/dotnet`n`n" +
             (Read-Package 'CommunityToolkit.Mvvm' $toolkit 'License.md') + "`n`n" +
-            (Read-Package 'CommunityToolkit.Mvvm' $toolkit 'ThirdPartyNotices.txt'),
-        "Entity Framework Core $($pinned['Microsoft.EntityFrameworkCore.Sqlite']), Microsoft.Data.Sqlite and Microsoft.Extensions.*`n" +
+            (Read-Package 'CommunityToolkit.Mvvm' $toolkit 'ThirdPartyNotices.txt')),
+        ("Entity Framework Core $($pinned['Microsoft.EntityFrameworkCore.Sqlite']), Microsoft.Data.Sqlite and Microsoft.Extensions.*`n" +
             "MIT licence, https://github.com/dotnet/efcore and https://github.com/dotnet/runtime`n`n" +
-            'Copyright (c) .NET Foundation and Contributors. Licensed under the same MIT licence as the .NET runtime above.',
-        "SQLitePCLRaw $sqlite`nApache License 2.0, https://github.com/ericsink/SQLitePCL.raw`nCopyright 2014-2024 SourceGear, LLC`n`n" +
-            (Read-Text (Join-Path $root 'installer\licenses\Apache-2.0.txt')),
-        "SQLite`nPublic domain, https://sqlite.org/copyright.html`n`n" +
+            'Copyright (c) .NET Foundation and Contributors. Licensed under the same MIT licence as the .NET runtime above.'),
+        ("SQLitePCLRaw $sqlite`nApache License 2.0, https://github.com/ericsink/SQLitePCL.raw`nCopyright 2014-2024 SourceGear, LLC`n`n" +
+            (Read-Text (Join-Path $root 'installer\licenses\Apache-2.0.txt'))),
+        ("SQLite`nPublic domain, https://sqlite.org/copyright.html`n`n" +
             'The author disclaims copyright to this source code. In place of a legal notice, here is a blessing: ' +
             'May you do good and not evil. May you find forgiveness for yourself and forgive others. ' +
-            'May you share freely, never taking more than you give.'
+            'May you share freely, never taking more than you give.')
     )
 
     $text = "WinLevers bundles the components below. Each keeps its own licence.`n`n" +
