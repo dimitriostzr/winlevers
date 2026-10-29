@@ -23,7 +23,10 @@
   <sub>Free, no account. <a href="#first-run-the-windows-warnings">First-run notes</a> · <a href="#build-it-yourself">Build it yourself</a></sub>
 </p>
 
-![The app grid on the Microphone lens](docs/images/apps-grid.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/apps-grid-dark.png" />
+  <img src="docs/images/apps-grid-light.png" alt="The app grid on the Microphone lens" />
+</picture>
 
 ---
 
@@ -120,7 +123,10 @@ Every desktop app from the uninstall records, and every packaged app Windows has
 permission for, in one sortable grid. Pick a lens in the sidebar to see one lever across all of
 them, with live counts, then select any set of apps and change several levers in one batch.
 
-![The GPU power preference lens](docs/images/gpu-preference.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/gpu-preference-dark.png" />
+  <img src="docs/images/gpu-preference-light.png" alt="The GPU power preference lens" />
+</picture>
 
 ### Privacy advisor
 
@@ -128,14 +134,20 @@ The permissions that matter most (camera, microphone, location and the like), wh
 each one, and a one-click deny for the allowed apps or for those with no setting. A bar shows
 the machine's overall privacy posture.
 
-![The privacy advisor](docs/images/privacy-advisor.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/privacy-advisor-dark.png" />
+  <img src="docs/images/privacy-advisor-light.png" alt="The privacy advisor" />
+</picture>
 
 ### Dashboard
 
 An overview of the machine across every lever: how many apps are allowed, denied and not set,
 from the latest scan.
 
-![The dashboard](docs/images/dashboard.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/dashboard-dark.png" />
+  <img src="docs/images/dashboard-light.png" alt="The dashboard" />
+</picture>
 
 ### History and rollback
 
@@ -143,7 +155,10 @@ Every batch you have applied, every write in it with the old and new value, and 
 the whole batch or a single change. A value changed by something else since is reported and left
 alone.
 
-![History and rollback](docs/images/history.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/history-dark.png" />
+  <img src="docs/images/history-light.png" alt="History and rollback" />
+</picture>
 
 ### And also
 
@@ -151,7 +166,10 @@ alone.
 - **Exports:** CSV and Markdown of everything the grid shows.
 - **Settings:** light and dark themes, table options, and the window remembers where it was.
 
-![Settings](docs/images/settings.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/settings-dark.png" />
+  <img src="docs/images/settings-light.png" alt="Settings" />
+</picture>
 
 ## How it works
 
