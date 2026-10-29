@@ -62,7 +62,8 @@ WizardStyle=modern
 CloseApplications=yes
 
 OutputDir={#OutputDir}
-OutputBaseFilename={#AppName}-{#AppVersion}-win-{#Arch}-setup
+; No version in the name, so releases/latest/download/<name> stays a stable link.
+OutputBaseFilename={#AppName}-win-{#Arch}-setup
 Compression=lzma2/ultra64
 SolidCompression=yes
 

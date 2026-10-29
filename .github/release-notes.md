@@ -5,10 +5,10 @@ shows every registry write before it happens, and can put any change back.
 
 | File | What it is |
 | --- | --- |
-| `WinLevers-*-win-x64-setup.exe` | Installer for Intel and AMD PCs |
-| `WinLevers-*-win-arm64-setup.exe` | Installer for ARM PCs (Snapdragon and similar) |
-| `WinLevers-*-win-x64-portable.zip` | No install: unzip anywhere and run `WinLevers.App.exe` |
-| `WinLevers-*-win-arm64-portable.zip` | The same, for ARM PCs |
+| `WinLevers-win-x64-setup.exe` | Installer for Intel and AMD PCs |
+| `WinLevers-win-arm64-setup.exe` | Installer for ARM PCs (Snapdragon and similar) |
+| `WinLevers-win-x64-portable.zip` | No install: unzip anywhere and run `WinLevers.App.exe` |
+| `WinLevers-win-arm64-portable.zip` | The same, for ARM PCs |
 | `SHA256SUMS.txt` | Checksums for the files above |
 
 Requires Windows 10 version 1809 or later, 64-bit. Nothing else needs to be installed: the .NET

@@ -65,7 +65,8 @@ foreach ($a in $Arch) {
         -p:SelfContained=true -p:WindowsAppSDKSelfContained=true -o $publish
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $rid." }
 
-    $zip = Join-Path $out "WinLevers-$Version-$rid-portable.zip"
+    # No version in the name, so releases/latest/download/<name> stays a stable link.
+    $zip = Join-Path $out "WinLevers-$rid-portable.zip"
     if (Test-Path $zip) { Remove-Item -Force $zip }
     Write-Host "== Zipping $zip"
     [System.IO.Compression.ZipFile]::CreateFromDirectory($publish, $zip,
